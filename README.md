@@ -9,6 +9,8 @@ Optionally, displays:
 - The length of time since the switch occurred
     - Optionally, only if that time exceeds a configured threshold
 
+[![Screenshot](./img/readme-screenshot.png)](./img/readme-screenshot.png)
+
 ## Installation
 
 The simple version:
