@@ -1,0 +1,33 @@
+{
+    "name": "u1f408/pluralkit-are-we-awake",
+    "description": "Simple PluralKit API frontend to display a system's current fronters",
+    "type": "project",
+    "license": "AGPLv3",
+    "authors": [
+        {
+            "name": "Iris System",
+            "email": "iris@iris.ac.nz"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/u1f408/ix-framework"
+        }
+    ],
+    "require": {
+        "ext-curl": "*",
+        "u1f408/ix-framework": "dev-main",
+        "vlucas/phpdotenv": "^5.3",
+        "philipp15b/php-i18n": "^4.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.87",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "PKAwake\\": "lib/"
+        }
+    }
+}
