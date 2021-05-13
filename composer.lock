@@ -2943,12 +2943,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/u1f408/ix-framework.git",
-                "reference": "f6af4cb3beec5f5f67d6c0cc22009b66c3cc5d01"
+                "reference": "4f1392d747cd5854d7751935836399820f0789d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/u1f408/ix-framework/zipball/f6af4cb3beec5f5f67d6c0cc22009b66c3cc5d01",
-                "reference": "f6af4cb3beec5f5f67d6c0cc22009b66c3cc5d01",
+                "url": "https://api.github.com/repos/u1f408/ix-framework/zipball/4f1392d747cd5854d7751935836399820f0789d8",
+                "reference": "4f1392d747cd5854d7751935836399820f0789d8",
                 "shasum": ""
             },
             "require": {
@@ -2988,7 +2988,7 @@
                 "source": "https://github.com/u1f408/ix-framework/tree/main",
                 "issues": "https://github.com/u1f408/ix-framework/issues"
             },
-            "time": "2021-05-12T22:03:21+00:00"
+            "time": "2021-05-13T06:20:40+00:00"
         },
         {
             "name": "u1f408/phphelpers",
