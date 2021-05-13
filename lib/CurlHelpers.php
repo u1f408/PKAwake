@@ -19,7 +19,7 @@ final class CurlHelpers {
 	 * @param bool $json_only If `true`, return `false` when response is not JSON
 	 * @return mixed|string|false The potentially-decoded response body
 	 */
-	public static function fetchUrl(string $url, array $curlopts = [], bool $json_only = false): mixed {
+	public static function fetchUrl(string $url, array $curlopts = [], bool $json_only = false) {
 		$ch = curl_init();
 		curl_setopt_array($ch, $curlopts);
 		curl_setopt_array($ch, [
