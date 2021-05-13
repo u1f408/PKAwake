@@ -1,0 +1,12 @@
+parameters:
+    level: 7
+
+    bootstrapFiles:
+        - tests/bootstrap.php
+    paths:
+        - lib
+        - public
+
+    ignoreErrors:
+        # Let the i18n stuff fly
+        - '#Function L not found#'
