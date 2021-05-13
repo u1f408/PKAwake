@@ -1,0 +1,7 @@
+.env
+.env.*
+!.env.dist
+!.env.ci
+/vendor
+/cache
+.phpunit.result.cache
