@@ -126,13 +126,58 @@ class PluralKitFetcher {
 			];
 		}
 
-		/* Gather information about the switch
+		/* Gather information about the current switch
 		 */
 
-		$result['switch'] = [
+		$result['currentswitch'] = [
 			'timestamp' => $fronter_info['timestamp'],
 			'members' => array_keys($result['members']),
 		];
+
+		/* Lastly - get the list of switches, and walk it backwards to find
+		 * the switch that happened immediately after the last switch-out.
+		 */
+
+		/** @var string $switch_info_url */
+		$switch_info_url = self::API_BASE . "/s/{$this->systemID}/switches";
+
+		/** @var array<string, mixed>|false $switch_info */
+		$switch_info = CurlHelpers::fetchUrl($switch_info_url, [], true);
+		if ($switch_info === false)
+			return null;
+
+		/* Walk the switch list
+		 */
+
+		$switch_out_idx = null;
+		foreach ($switch_info as $idx => $switch) {
+			if (empty($switch['members'])) {
+				$switch_out_idx = $idx;
+				break;
+			}
+		}
+
+		/* Gather information about the switch immediately after the last
+		 * switch-out.
+		 *
+		 * If `$switch_out_idx` is `0`, we're currently in a switch-out, so
+		 * just leave `$result['awakeswitch']` as null.
+		 *
+		 * If `$switch_out_idx` is `null`, we couldn't find a switch-out in
+		 * the walk, so use the earliest switch returned by the PluralKit API.
+		 */
+
+		$result['awakeswitch'] = null;
+		if ($switch_out_idx !== 0) {
+			$awakeswitch_idx = (is_null($switch_out_idx) ? count($switch_info) : $switch_out_idx) - 1;
+			$awakeswitch = $switch_info[$awakeswitch_idx];
+			if (!empty($awakeswitch)) {
+				$result['awakeswitch'] = [
+					'timestamp' => $awakeswitch['timestamp'],
+					'members' => array_values($awakeswitch['members']),
+				];
+			}
+		}
 
 		/* And we're done here!
 		 */

@@ -23,28 +23,35 @@ class DisplayController extends Controller {
 		if ($pk_data === null)
 			throw new HttpInternalServerErrorException($request);
 
-		/* Get our HTML title
-		 */
-
-		$title = empty($pk_data['switch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
-		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_AWAKE']) === true) {
-			$title = empty($pk_data['switch']['members']) ? \L('status_asleep') : \L('status_awake');
-		}
-
-		/* Pls can has HtmlRenderer?
+		/* Get our HtmlRender and the query values array.
 		 */
 
 		$html = $this->container->get('html');
+		$query_values = (array) $request->getQueryParams();
+
+		/* Get our status string
+		 */
+
+		$status = empty($pk_data['currentswitch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
+		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_AWAKE']) === true) {
+			$status = empty($pk_data['currentswitch']['members']) ? \L('status_asleep') : \L('status_awake');
+		}
 
 		/* Render the front duration, if enabled
 		 */
 		$duration = [];
-		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE'])) {
+		if (array_key_exists('ts', $query_values) ? boolval($query_values['ts']) : boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE'])) {
+			$switch_key = 'awakeswitch';
+			if (array_key_exists('tc', $query_values) && boolval($query_values['tc']))
+				$switch_key = 'currentswitch';
+			if ($pk_data['awakeswitch'] === null)
+				$switch_key = 'currentswitch';
+
 			$switch_ts = \DateTime::createFromFormat(
 				\DateTimeInterface::RFC3339,
-				preg_replace('#\.\d+#', '', $pk_data['switch']['timestamp']),
+				preg_replace('#\.\d+#', '', $pk_data[$switch_key]['timestamp']),
 			);
-			
+
 			if ($switch_ts !== false) {
 				$diff_now = $switch_ts->diff(new \DateTime('now'));
 
@@ -52,9 +59,11 @@ class DisplayController extends Controller {
 				$diff_abs_seconds = intval(\DateTime::createFromFormat('U', '0')->add($diff_now)->format('U'));
 
 				$display_duration = true;
-				if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED'])) {
-					$threshold = intval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_THRESHOLD']);
-					$display_duration = ($diff_abs_seconds >= $threshold);
+				if (!array_key_exists('ts', $query_values)) {
+					if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED'])) {
+						$threshold = intval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_THRESHOLD']);
+						$display_duration = ($diff_abs_seconds >= $threshold);
+					}
 				}
 
 				if ($display_duration) {
@@ -76,10 +85,7 @@ class DisplayController extends Controller {
 								[
 									'title' => $switch_ts->format(\DateTimeInterface::RFC3339),
 								],
-								...[
-									"{$diff_hours}h ",
-									"{$diff_now->i}m ",
-								]
+								" {$diff_hours}h {$diff_now->i}m ",
 							),
 							\L('duration_after')
 						]
@@ -92,8 +98,8 @@ class DisplayController extends Controller {
 		 */
 
 		$member_cards = [];
-		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS'])) {
-			foreach ($pk_data['switch']['members'] as $memberID) {
+		if (array_key_exists('fm', $query_values) ? boolval($query_values['fm']) : boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS'])) {
+			foreach ($pk_data['currentswitch']['members'] as $memberID) {
 				$member = $pk_data['members'][$memberID];
 				$member_color = '#' . ($member['color'] ?? '000');
 				$member_cards[] = $html->tagHasChildren(
@@ -123,14 +129,14 @@ class DisplayController extends Controller {
 				$html->tag('meta', ['charset' => 'utf-8']),
 				$html->tag('meta', ['name' => 'viewport', 'content' => 'initial-scale=1, width=device-width']),
 				$html->tag('link', ['rel' => 'stylesheet', 'href' => '/styles.css']),
-				$html->tagHasChildren('title', [], $title),
+				$html->tagHasChildren('title', [], implode(" ", [$pk_data['system']['name'], \L('string_is_status', [$status])])),
 			],
 			[
 				$html->tagHasChildren('main', ['data-system-id' => $pk_data['system']['id']], ...[
 					/* Main text */
 					$html->tagHasChildren('h1', ['class' => 'big-status'], ...[
-						$html->tagHasChildren('span', [], \L('string_system_is', [$pk_data['system']['name']])),
-						$html->tagHasChildren('strong', ['class' => 'current-status'], $title),
+						$html->tagHasChildren('span', [], $pk_data['system']['name']),
+						$html->tagHasChildren('strong', ['class' => 'current-status'], \L('string_is_status', [$status])),
 					]),
 
 					/* Duration */
