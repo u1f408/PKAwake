@@ -9,7 +9,27 @@ Optionally, displays:
 - The length of time since the switch occurred
     - Optionally, only if that time exceeds a configured threshold
 
-[![Screenshot](./img/readme-screenshot.png)](./img/readme-screenshot.png)
+-----
+
+<details>
+<summary>Screenshots</summary>
+
+**Awake:** (system has current fronters)
+
+<p align="center" style="text-align:center">
+
+[![Screenshot - awake (system has current fronters)](./img/screenshot-awake.png)](./img/screenshot-awake.png)
+
+</p>
+
+**Asleep:** (system is switched out)
+
+<p align="center" style="text-align:center">
+
+[![Screenshot - asleep (system is switched out)](./img/screenshot-asleep.png)](./img/screenshot-asleep.png)
+
+</p>
+</details>
 
 ## Installation
 
@@ -31,8 +51,8 @@ as well as improves page load times:
 ```shell
 % tail -n4 .env
 ## Should we cache the PluralKit API responses in Redis?
-## If `true`, we need a REDIS_URL
-SITE_CACHE_ENABLED="true"
+## If `1`, we need a REDIS_URL
+SITE_CACHE_ENABLED="1"
 REDIS_URL="redis://localhost/0"
 ```
 
