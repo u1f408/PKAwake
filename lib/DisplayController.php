@@ -59,7 +59,7 @@ class DisplayController extends Controller {
 				$diff_abs_seconds = intval(\DateTime::createFromFormat('U', '0')->add($diff_now)->format('U'));
 
 				$display_duration = true;
-				if (!array_key_exists('ts', $query_values)) {
+				if (!(array_key_exists('ts', $query_values) && boolval($query_values['ts']))) {
 					if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED'])) {
 						$threshold = intval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_THRESHOLD']);
 						$display_duration = ($diff_abs_seconds >= $threshold);
@@ -67,11 +67,8 @@ class DisplayController extends Controller {
 				}
 
 				if ($display_duration) {
-					/* XXX: Fix this later */
-					$diff_hours = $diff_now->h
-						+ ($diff_now->d * 24)
-						+ ($diff_now->m * 24 * 30)
-						+ ($diff_now->y * 24 * 365);
+					list($diff_minutes, $diff_seconds) = [intdiv($diff_abs_seconds, 60), ($diff_abs_seconds % 60)];
+					list($diff_hours, $diff_minutes) = [intdiv($diff_minutes, 60), ($diff_minutes % 60)];
 
 					$duration[] = $html->tagHasChildren(
 						'section',
@@ -85,7 +82,7 @@ class DisplayController extends Controller {
 								[
 									'title' => $switch_ts->format(\DateTimeInterface::RFC3339),
 								],
-								" {$diff_hours}h {$diff_now->i}m ",
+								" {$diff_hours}h {$diff_minutes}m ",
 							),
 							\L('duration_after')
 						]
