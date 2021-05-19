@@ -31,6 +31,20 @@ body.asleep
 	color: hsla(360, 100%, 100%, 1);
 }
 
+a,
+a:visited,
+a:focus,
+a:hover
+{
+	color: inherit;
+}
+
+a:focus,
+a:hover
+{
+	text-decoration-thickness: 3px;
+}
+
 main
 {
 	display: flex;
@@ -124,4 +138,14 @@ dd + dd
 {
 	width: 100%;
 	padding-left: calc(clamp(5rem, 20%, 9rem) + 1em);
+}
+
+.pkawake-footer
+{
+	position: absolute;
+	bottom: 0.5rem;
+	right: 0.5rem;
+
+	text-align: center;
+	font-size: 0.8rem;
 }

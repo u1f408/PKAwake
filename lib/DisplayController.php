@@ -142,6 +142,11 @@ class DisplayController extends Controller {
 
 					/* Member cards */
 					empty($member_cards) ? '' : $html->tagHasChildren('div', ['class' => 'member-cards'], ...$member_cards),
+
+					/* Link to PKAwake repo */
+					$html->tagHasChildren('footer', ['class' => 'pkawake-footer'], ...[
+						$html->tagHasChildren('a', ['href' => 'https://github.com/u1f408/PKAwake', 'rel' => 'noopener noreferrer'], \L('powered_by')),
+					]),
 				]),
 			],
 			[],
