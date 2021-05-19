@@ -32,6 +32,7 @@ class DisplayController extends Controller {
 		/* Get our status string
 		 */
 
+		$body_classes = empty($pk_data['currentswitch']['members']) ? 'asleep' : 'awake';
 		$status = empty($pk_data['currentswitch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
 		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_AWAKE']) === true) {
 			$status = empty($pk_data['currentswitch']['members']) ? \L('status_asleep') : \L('status_awake');
@@ -143,6 +144,10 @@ class DisplayController extends Controller {
 					empty($member_cards) ? '' : $html->tagHasChildren('div', ['class' => 'member-cards'], ...$member_cards),
 				]),
 			],
+			[],
+			[
+				'class' => $body_classes,
+			]
 		));
 
 		return $response;

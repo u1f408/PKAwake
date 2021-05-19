@@ -19,6 +19,18 @@ body
 	font-family: 'Comic Sans MS', sans-serif;
 }
 
+body.awake
+{
+	background: hsla(360, 100%, 100%, 1);
+	color: hsla(0, 0%, 0%, 1);
+}
+
+body.asleep
+{
+	background: hsla(0, 0%, 20%, 1);
+	color: hsla(360, 100%, 100%, 1);
+}
+
 main
 {
 	display: flex;
