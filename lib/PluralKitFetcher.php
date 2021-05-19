@@ -141,7 +141,7 @@ class PluralKitFetcher {
 		/** @var string $switch_info_url */
 		$switch_info_url = self::API_BASE . "/s/{$this->systemID}/switches";
 
-		/** @var array<string, mixed>|false $switch_info */
+		/** @var array<int, mixed>|false $switch_info */
 		$switch_info = CurlHelpers::fetchUrl($switch_info_url, [], true);
 		if ($switch_info === false)
 			return null;
@@ -169,7 +169,7 @@ class PluralKitFetcher {
 
 		$result['awakeswitch'] = null;
 		if ($switch_out_idx !== 0) {
-			$awakeswitch_idx = (is_null($switch_out_idx) ? count($switch_info) : $switch_out_idx) - 1;
+			$awakeswitch_idx = intval((is_null($switch_out_idx) ? count($switch_info) : $switch_out_idx)) - 1;
 			$awakeswitch = $switch_info[$awakeswitch_idx];
 			if (!empty($awakeswitch)) {
 				$result['awakeswitch'] = [
