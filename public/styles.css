@@ -68,7 +68,7 @@ main
 	background-attachment: scroll;
 	
 	color: white;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 .member-card-title
@@ -78,9 +78,9 @@ main
 }
 
 dl {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
 }
 
 dl > * {
@@ -88,9 +88,9 @@ dl > * {
 }
 
 dt {
-    width: clamp(5rem, 20%, 9rem);
-    font-weight: bold;
-    text-align: right;
+	width: clamp(5rem, 20%, 9rem);
+	font-weight: bold;
+	text-align: right;
 }
 
 dt + dt {
@@ -113,5 +113,3 @@ dd + dd
 	width: 100%;
 	padding-left: calc(clamp(5rem, 20%, 9rem) + 1em);
 }
-
-
