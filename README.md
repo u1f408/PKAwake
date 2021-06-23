@@ -9,6 +9,12 @@ Optionally, displays:
 - The length of time since the switch occurred
     - Optionally, only if that time exceeds a configured threshold
 
+You can specify a PluralKit system ID in the URL to
+display that system instead of the one configured in
+the environment. For example, navigating to
+[awake.iris.ac.nz/exmpl](https://awake.iris.ac.nz/exmpl)
+will show the PluralKit Example System.
+
 -----
 
 <details>
