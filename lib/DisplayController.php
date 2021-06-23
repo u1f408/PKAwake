@@ -19,7 +19,14 @@ class DisplayController extends Controller {
 		/* Get the current PluralKit status
 		 */
 
-		$pk_data = PluralKitFetcher::from_env()->retrieve();
+		$systemID = null;
+		$routeArgs = $request->getAttribute('__routingResults__')->getRouteArguments();
+		if (array_key_exists('system', $routeArgs))
+			$systemID = $routeArgs['system'];
+		if ($systemID === null)
+			$systemID = $_ENV[IX_ENVBASE . '_PLURALKIT_SYSTEM'];
+
+		$pk_data = (new PluralKitFetcher($systemID))->retrieve();
 		if ($pk_data === null)
 			throw new HttpInternalServerErrorException($request);
 
