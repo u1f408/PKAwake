@@ -80,6 +80,9 @@ main
 
 .member-card
 {
+	position: relative;
+	overflow: hidden;
+
 	border: 4px solid #000;
 	border-radius: 8px;
 
@@ -87,11 +90,6 @@ main
 	padding: 1rem;
 	
 	min-width: 20rem;
-	
-	background-size: cover;
-	background-origin: border-box;
-	background-repeat: no-repeat;
-	background-attachment: scroll;
 	
 	color: white;
 	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -101,6 +99,31 @@ main
 {
 	margin: 0 0 1rem 0;
 	padding: 0;
+}
+
+.member-card-image
+{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	width: 100%;
+	height: 100%;
+
+	z-index: -1000;
+	overflow: hidden;
+
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+	align-items: center;
+}
+
+.member-card-image img
+{
+	width: 100%;
 }
 
 dl {

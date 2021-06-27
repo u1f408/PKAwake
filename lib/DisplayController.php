@@ -112,9 +112,12 @@ class DisplayController extends Controller {
 					[
 						'data-member-id' => $memberID,
 						'class' => "member-card member-card--{$memberID}",
-						'style' => "border-color:{$member_color};background-image:url({$member['avatar_url']})"
+						'style' => "border-color:{$member_color}"
 					],
 					...[
+						$html->tagHasChildren('div', ['class' => 'member-card-image'], ...[
+							$html->tag('img', ['src' => $member['avatar_url']]),
+						]),
 						$html->tagHasChildren('h2', ['class' => 'member-card-title'], $member['display_name'] ?? $member['name']),
 						$html->tagHasChildren('dl', [], ...[
 							/* Pronouns */
