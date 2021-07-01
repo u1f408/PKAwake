@@ -75,7 +75,7 @@ class ApiController extends Controller {
 		}
 
 		// And, return the JSON
-		$response->getBody()->write(json_encode($output));
+		$response->getBody()->write((string) json_encode($output));
 		$response = $response->withHeader('Content-Type', 'application/json');
 		return $response;
 	}
