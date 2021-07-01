@@ -96,6 +96,7 @@ class PluralKitFetcher {
 			'id' => $system_info['id'],
 			'name' => $system_info['name'],
 			'timezone' => $system_info['tz'] ?? 'UTC',
+			'avatar_url' => $system_info['avatar_url'],
 		];
 
 		/* Next - get the current fronter information.
