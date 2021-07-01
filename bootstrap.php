@@ -17,6 +17,7 @@ HookMachine::add([Container::class, 'construct'], '\ix\Container\ContainerHooksH
 
 /* Application routes */
 HookMachine::add([Application::class, 'create_app', 'routeRegister'], (function ($key, $app) {
-	$app->get('/[{system}]', \PKAwake\DisplayController::class)->setName('index');
+	$app->get('/[{system:[a-z]{5}}]', \PKAwake\DisplayController::class)->setName('index');
+	$app->get('/api[/{system:[a-z]{5}}]', \PKAwake\ApiController::class)->setName('api');
 	return $app;
 }));
