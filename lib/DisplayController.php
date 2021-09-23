@@ -107,6 +107,10 @@ class DisplayController extends Controller {
 			foreach ($pk_data['currentswitch']['members'] as $memberID) {
 				$member = $pk_data['members'][$memberID];
 				$member_color = '#' . ($member['color'] ?? '000');
+				$member_name = $member['name'];
+				if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS_DISPLAY_NAME']))
+					$member_name = $member['display_name'] ?? $member['name'];
+
 				$member_cards[] = $html->tagHasChildren(
 					'section',
 					[
@@ -118,7 +122,7 @@ class DisplayController extends Controller {
 						$html->tagHasChildren('div', ['class' => 'member-card-image'], ...[
 							$html->tag('img', ['src' => $member['avatar_url']]),
 						]),
-						$html->tagHasChildren('h2', ['class' => 'member-card-title'], $member['display_name'] ?? $member['name']),
+						$html->tagHasChildren('h2', ['class' => 'member-card-title'], $member_name),
 						$html->tagHasChildren('dl', [], ...[
 							/* Pronouns */
 							$html->tagHasChildren('dt', [], \L('field_pronouns')),
