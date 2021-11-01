@@ -16,39 +16,36 @@ class DisplayController extends Controller {
 	 * @return Response The resulting Response object
 	 */
 	public function requestGET(Request $request, Response $response, ?array $args = []): Response {
+		$routeArgs = $request->getAttribute('__routingResults__')->getRouteArguments();
+
+		/* Get our Twig renderer and the query values array.
+		 */
+
+		$twig = $this->container->get('view');
+		$query_values = (array) $request->getQueryParams();
+
 		/* Get the current PluralKit status
 		 */
 
-		$systemID = null;
-		$routeArgs = $request->getAttribute('__routingResults__')->getRouteArguments();
+		$systemID = $_ENV[IX_ENVBASE . '_PLURALKIT_SYSTEM'];
 		if (array_key_exists('system', $routeArgs))
 			$systemID = $routeArgs['system'];
-		if ($systemID === null)
-			$systemID = $_ENV[IX_ENVBASE . '_PLURALKIT_SYSTEM'];
 
 		$pk_data = (new PluralKitFetcher($systemID))->retrieve();
-		if ($pk_data === null)
-			throw new HttpInternalServerErrorException($request);
-
-		/* Get our HtmlRender and the query values array.
-		 */
-
-		$html = $this->container->get('html');
-		$query_values = (array) $request->getQueryParams();
-
-		/* Get our status string
-		 */
-
-		$body_classes = empty($pk_data['currentswitch']['members']) ? 'asleep' : 'awake';
-		$status = empty($pk_data['currentswitch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
-		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_AWAKE']) === true) {
-			$status = empty($pk_data['currentswitch']['members']) ? \L('status_asleep') : \L('status_awake');
+		if ($pk_data === null) {
+			$twig->render($response, 'pluralkit_error.html.twig');
+			return $response->withStatus(500);
 		}
 
-		/* Render the front duration, if enabled
+		/* Render the front duration
 		 */
-		$duration = [];
-		if (array_key_exists('ts', $query_values) ? boolval($query_values['ts']) : boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE'])) {
+
+		$display_duration = boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE']);
+		if (array_key_exists('ts', $query_values))
+			$display_duration = boolval($query_values['ts']);
+
+		$switch_ts = $switch_rel = null;
+		if ($display_duration) {
 			$switch_key = 'awakeswitch';
 			if (array_key_exists('tc', $query_values) && boolval($query_values['tc']))
 				$switch_key = 'currentswitch';
@@ -60,114 +57,58 @@ class DisplayController extends Controller {
 				preg_replace('#\.\d+#', '', $pk_data[$switch_key]['timestamp']),
 			);
 
+			$switch_rel = null;
 			if ($switch_ts !== false) {
 				$diff_now = $switch_ts->diff(new \DateTime('now'));
 
 				/** @phpstan-ignore-next-line */
 				$diff_abs_seconds = intval(\DateTime::createFromFormat('U', '0')->add($diff_now)->format('U'));
 
-				$display_duration = true;
-				if (!(array_key_exists('ts', $query_values) && boolval($query_values['ts']))) {
-					if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED'])) {
-						$threshold = intval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_THRESHOLD']);
-						$display_duration = ($diff_abs_seconds >= $threshold);
-					}
-				}
+				list($diff_minutes, $diff_seconds) = [intdiv($diff_abs_seconds, 60), ($diff_abs_seconds % 60)];
+				list($diff_hours, $diff_minutes) = [intdiv($diff_minutes, 60), ($diff_minutes % 60)];
 
-				if ($display_duration) {
-					list($diff_minutes, $diff_seconds) = [intdiv($diff_abs_seconds, 60), ($diff_abs_seconds % 60)];
-					list($diff_hours, $diff_minutes) = [intdiv($diff_minutes, 60), ($diff_minutes % 60)];
-
-					$duration[] = $html->tagHasChildren(
-						'section',
-						[
-							'class' => 'duration',
-						],
-						...[
-							\L('duration_before'),
-							$html->tagHasChildren(
-								'span',
-								[
-									'title' => $switch_ts->format(\DateTimeInterface::RFC3339),
-								],
-								" {$diff_hours}h {$diff_minutes}m ",
-							),
-							\L('duration_after')
-						]
-					);
-				}
+				$switch_rel = "{$diff_hours}h {$diff_minutes}m";
 			}
 		}
 
-		/* Render the member cards, if enabled
+		/* Choose whether to render member cards
 		 */
 
-		$member_cards = [];
-		if (array_key_exists('fm', $query_values) ? boolval($query_values['fm']) : boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS'])) {
-			foreach ($pk_data['currentswitch']['members'] as $memberID) {
-				$member = $pk_data['members'][$memberID];
-				$member_color = '#' . ($member['color'] ?? '000');
-				$member_name = $member['name'];
-				if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS_DISPLAY_NAME']))
-					$member_name = $member['display_name'] ?? $member['name'];
+		$display_members = boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS']);
+		if (array_key_exists('fm', $query_values))
+			$display_members = boolval($query_values['fm']);
 
-				$member_cards[] = $html->tagHasChildren(
-					'section',
-					[
-						'data-member-id' => $memberID,
-						'class' => "member-card member-card--{$memberID}",
-						'style' => "border-color:{$member_color}"
-					],
-					...[
-						$html->tagHasChildren('div', ['class' => 'member-card-image'], ...[
-							$html->tag('img', ['src' => $member['avatar_url']]),
-						]),
-						$html->tagHasChildren('h2', ['class' => 'member-card-title'], $member_name),
-						$html->tagHasChildren('dl', [], ...[
-							/* Pronouns */
-							$html->tagHasChildren('dt', [], \L('field_pronouns')),
-							$html->tagHasChildren('dd', [], $member['pronouns'] ?? \L('unknown')),
-						]),
-					]
-				);
-			}
-		}
+		$display_members_dn = boolval($_ENV[IX_ENVBASE . '_DISPLAY_MEMBERS_DISPLAY_NAME']);
+		if (array_key_exists('dn', $query_values))
+			$display_members_dn = boolval($query_values['dn']);
+
+		/* Pick up some other settings from either the environment or
+		 * query values
+		 */
+
+		$display_awake = boolval($_ENV[IX_ENVBASE . '_DISPLAY_AWAKE']);
+		if (array_key_exists('da', $query_values))
+			$display_awake = boolval($query_values['da']);
 
 		/* Render the main document
 		 */
 
-		$response->getBody()->write($html->renderDocument(
-			[
-				$html->tag('meta', ['charset' => 'utf-8']),
-				$html->tag('meta', ['name' => 'viewport', 'content' => 'initial-scale=1, width=device-width']),
-				$html->tag('link', ['rel' => 'stylesheet', 'href' => '/styles.css']),
-				$html->tagHasChildren('title', [], implode(" ", [$pk_data['system']['name'], \L('string_is_status', [$status])])),
-			],
-			[
-				$html->tagHasChildren('main', ['data-system-id' => $pk_data['system']['id']], ...[
-					/* Main text */
-					$html->tagHasChildren('h1', ['class' => 'big-status'], ...[
-						$html->tagHasChildren('span', [], $pk_data['system']['name']),
-						$html->tagHasChildren('strong', ['class' => 'current-status'], \L('string_is_status', [$status])),
-					]),
+		$body_classes = empty($pk_data['currentswitch']['members']) ? 'asleep' : 'awake';
+		$status = empty($pk_data['currentswitch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
+		if ($display_awake)
+			$status = empty($pk_data['currentswitch']['members']) ? \L('status_asleep') : \L('status_awake');
 
-					/* Duration */
-					$duration,
-
-					/* Member cards */
-					empty($member_cards) ? '' : $html->tagHasChildren('div', ['class' => 'member-cards'], ...$member_cards),
-
-					/* Link to PKAwake repo */
-					$html->tagHasChildren('footer', ['class' => 'pkawake-footer'], ...[
-						$html->tagHasChildren('a', ['href' => 'https://github.com/u1f408/PKAwake', 'rel' => 'noopener noreferrer'], \L('powered_by')),
-					]),
-				]),
-			],
-			[],
-			[
-				'class' => $body_classes,
-			]
-		));
+		$twig->render($response, 'index.html.twig', [
+			'body_classes' => $body_classes,
+			'status' => $status,
+			'pk_data' => $pk_data,
+			'switch_ts' => $switch_ts,
+			'switch_rel' => $switch_rel,
+			'display_awake' => $display_awake,
+			'display_duration' => $display_duration,
+			'display_members' => $display_members,
+			'display_members_dn' => $display_members_dn,
+		]);
 
 		return $response;
 	}

@@ -1,0 +1,9 @@
+{% extends "layout.html.twig" %}
+{% block title %}{{ L('error_title') }}{% endblock title %}
+{% block bodyclass %}error{% endblock bodyclass %}
+{% block body %}
+<main>
+	<h1>{{ L('error_title') }}</h1>
+	<p>{{ L('error_content') }}</p>
+</main>
+{% endblock body %}
