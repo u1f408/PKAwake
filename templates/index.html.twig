@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+{% block title %}{{ pk_data.system.name }} {{ L('string_is_status', status) }}{% endblock title %}
+{% block bodyclass %}{{ body_classes }}{% endblock bodyclass %}
+{% block body %}
+<main data-system-id="{{ pk_data.system.id }}">
+    <h1 class="big-status">
+        <span>{{ pk_data.system.name }}</span>
+        <strong class="current-status">{{ L('string_is_status', status) }}</strong>
+    </h1>
+
+    {% if display_duration %}
+    <section class="duration">
+        {{ L('duration_before') }}
+        <span title="{{ switch_ts | format_datetime('full', 'full') }}">
+            {{ switch_rel }}
+        </span>
+        {{ L('duration_after') }}
+    </section>
+    {% endif %}
+
+    {% if display_members %}
+    <section class="member-cards">
+        {% for memberId in pk_data.currentswitch.members %}
+            {% set member = pk_data.members[memberId] %}
+            {% if member.color %}{% set memberColor = member.color %}{% else %}{% set memberColor = '000' %}{% endif %}
+            {% set memberName = member.name %}
+            {% if display_members_dn %}{% if member.display_name %}{% set memberName = member.display_name %}{% endif %}{% endif %}
+
+            <section
+                class="member-card member-card--{{ memberId }}"
+                data-member-id="{{ memberId }}"
+                style="border-color:#{{ memberColor }}"
+            >
+                <div class="member-card-image">
+                    <img src="{{ member.avatar_url }}">
+                </div>
+                <h2 class="member-card-title">{{ memberName }}</h2>
+
+                <dl>
+                    {# Pronouns #}
+                    <dt>{{ L('field_pronouns') }}</dt>
+                    <dd>{% if member.pronouns %}{{ member.pronouns }}{% else %}{{ L('unknown') }}{% endif %}</dd>
+                </dl>
+            </section>
+        {% endfor %}
+    </section>
+    {% endif %}
+</main>
+{% endblock body %}

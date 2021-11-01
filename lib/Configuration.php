@@ -45,16 +45,10 @@ class Configuration {
 
 		// Toggle showing member cards
 		$dotenv->required(IX_ENVBASE . '_DISPLAY_MEMBERS')->isBoolean();
+		$dotenv->ifPresent(IX_ENVBASE . '_DISPLAY_MEMBERS_DISPLAY_NAME')->isBoolean();
 
 		// Toggle showing time since switch
 		$dotenv->required(IX_ENVBASE . '_DISPLAY_TIME_SINCE')->isBoolean();
-
-		// If displaying time since switch is enabled, this toggles whether that
-		// is only shown if the time exceeds the defined threshold (in minutes)
-		$dotenv->required(IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED')->isBoolean();
-		if (boolval($_ENV[IX_ENVBASE . '_DISPLAY_TIME_SINCE_GATED'])) {
-			$dotenv->required(IX_ENVBASE . '_DISPLAY_TIME_SINCE_THRESHOLD')->isInteger();
-		}
 
 		// If API response caching is enabled, require a Redis URL
 		$dotenv->required(IX_ENVBASE . '_CACHE_ENABLED')->isBoolean();

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PKAwake;
 
-use PKAwake\CurlHelpers;
+use IrisHelpers\CurlHelpers;
 use ix\Database\RedisContainer;
 
 class PluralKitFetcher {

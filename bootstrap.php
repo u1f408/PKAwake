@@ -12,8 +12,12 @@ use ix\Application\Application;
 /* Language initialization */
 (new \i18n(IX_BASE . '/lang/{LANGUAGE}.ini', IX_BASE . '/cache/lang', 'en'))->init();
 
+/* Application middleware */
+HookMachine::add([Application::class, 'create_app', 'preMiddleware'], '\ix\Application\ApplicationHooksTwig::hookApplicationMiddlewareTwig');
+
 /* Container hooks */
 HookMachine::add([Container::class, 'construct'], '\ix\Container\ContainerHooksHtmlRenderer::hookContainerHtmlRenderer');
+HookMachine::add([Container::class, 'construct'], '\PKAwake\ContainerHooksTwig::hookContainerTwig');
 
 /* Application routes */
 HookMachine::add([Application::class, 'create_app', 'routeRegister'], (function ($key, $app) {
