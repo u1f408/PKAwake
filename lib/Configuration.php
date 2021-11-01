@@ -45,6 +45,7 @@ class Configuration {
 
 		// Toggle showing member cards
 		$dotenv->required(IX_ENVBASE . '_DISPLAY_MEMBERS')->isBoolean();
+		$dotenv->ifPresent(IX_ENVBASE . '_DISPLAY_MEMBERS_DISPLAY_NAME')->isBoolean();
 
 		// Toggle showing time since switch
 		$dotenv->required(IX_ENVBASE . '_DISPLAY_TIME_SINCE')->isBoolean();
