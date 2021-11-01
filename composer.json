@@ -18,8 +18,10 @@
     "require": {
         "ext-curl": "*",
         "u1f408/ix-framework": "dev-main",
+        "u1f408/phphelpers": "^0.1",
         "vlucas/phpdotenv": "^5.3",
-        "philipp15b/php-i18n": "^4.0"
+        "philipp15b/php-i18n": "^4.0",
+        "twig/intl-extra": "^3.3"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.87",
