@@ -93,7 +93,7 @@ class DisplayController extends Controller {
 		/* Render the main document
 		 */
 
-		$body_classes = empty($pk_data['currentswitch']['members']) ? 'asleep' : 'awake';
+		$body_classes = $status_internal = empty($pk_data['currentswitch']['members']) ? 'asleep' : 'awake';
 		$status = empty($pk_data['currentswitch']['members']) ? \L('status_switched_out') : \L('status_switched_in');
 		if ($display_awake)
 			$status = empty($pk_data['currentswitch']['members']) ? \L('status_asleep') : \L('status_awake');
@@ -101,6 +101,7 @@ class DisplayController extends Controller {
 		$twig->render($response, 'index.html.twig', [
 			'body_classes' => $body_classes,
 			'status' => $status,
+			'status_internal' => $status_internal,
 			'pk_data' => $pk_data,
 			'switch_ts' => $switch_ts,
 			'switch_rel' => $switch_rel,

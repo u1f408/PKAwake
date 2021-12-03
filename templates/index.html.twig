@@ -1,49 +1,54 @@
 {% extends "layout.html.twig" %}
 {% block title %}{{ pk_data.system.name }} {{ L('string_is_status', status) }}{% endblock title %}
 {% block bodyclass %}{{ body_classes }}{% endblock bodyclass %}
+
+{% block meta %}
+{% if pk_data.system.avatar_url %}<link rel="shortcut icon" href="{{ pk_data.system.avatar_url }}">{% endif %}
+{% endblock meta %}
+
 {% block body %}
+{% if pk_data.system.color %}{% set sysColor = pk_data.system.color %}{% else %}{% set sysColor = '000' %}{% endif %}
+<header class="header" style="border-color:#{{ sysColor }}">
+	{% if pk_data.system.avatar_url %}<img class="header-avi" src="{{ pk_data.system.avatar_url }}">{% endif %}
+	<h1>{{ pk_data.system.name }}</h1>
+</header>
+
 <main data-system-id="{{ pk_data.system.id }}">
-    <h1 class="big-status">
-        <span>{{ pk_data.system.name }}</span>
-        <strong class="current-status">{{ L('string_is_status', status) }}</strong>
-    </h1>
+	<div class="wrapper">
+		<section class="status">
+			<i class="fa {% if status_internal == "awake" %}fa-sun-o{% else %}fa-moon-o{% endif %}"></i>
+			<span class="sr-only">{{ status }}</span>
 
-    {% if display_duration %}
-    <section class="duration">
-        {{ L('duration_before') }}
-        <span title="{{ switch_ts | format_datetime('full', 'full') }}">
-            {{ switch_rel }}
-        </span>
-        {{ L('duration_after') }}
-    </section>
-    {% endif %}
+			{% if display_duration %}
+				{{ L('duration_before') }}
+				<span title="{{ switch_ts | format_datetime('full', 'full') }}">
+					{{ switch_rel }}
+				</span>
+				{{ L('duration_after') }}
+			{% endif %}
+		</section>
 
-    {% if display_members %}
-    <section class="member-cards">
-        {% for memberId in pk_data.currentswitch.members %}
-            {% set member = pk_data.members[memberId] %}
-            {% if member.color %}{% set memberColor = member.color %}{% else %}{% set memberColor = '000' %}{% endif %}
-            {% set memberName = member.name %}
-            {% if display_members_dn %}{% if member.display_name %}{% set memberName = member.display_name %}{% endif %}{% endif %}
+		{% if display_members %}
+		<section class="member-cards">
+			{% for memberId in pk_data.currentswitch.members %}
+				{% set member = pk_data.members[memberId] %}
+				{% if member.color %}{% set memberColor = member.color %}{% else %}{% set memberColor = '000' %}{% endif %}
+				{% set memberName = member.name %}
+				{% if display_members_dn %}{% if member.display_name %}{% set memberName = member.display_name %}{% endif %}{% endif %}
 
-            <section
-                class="member-card member-card--{{ memberId }}"
-                data-member-id="{{ memberId }}"
-                style="border-color:#{{ memberColor }}"
-            >
-                <div class="member-card-image">
-                    <img src="{{ member.avatar_url }}">
-                </div>
-                <h2 class="member-card-title">{{ memberName }}</h2>
+				<section class="member-card" data-member-id="{{ memberId }}">
+					<div class="member-card-image" style="border-color:#{{ memberColor }}">
+						<img src="{{ member.avatar_url }}">
+					</div>
 
-                <dl>
-                    {# Pronouns #}
-                    <dt>{{ L('field_pronouns') }}</dt>
-                    <dd>{% if member.pronouns %}{{ member.pronouns }}{% else %}{{ L('unknown') }}{% endif %}</dd>
-                </dl>
-            </section>
-        {% endfor %}
-    </section>
-    {% endif %}
+					<div class="member-card-meta">
+						<h2 class="member-card-title">{{ memberName }}</h2>
+						{% if member.pronouns %}<span class="member-card-pronouns">({{ member.pronouns }})</span>{% endif %}
+					</div>
+				</section>
+			{% endfor %}
+		</section>
+		{% endif %}
+	</div>
 </main>
 {% endblock body %}
