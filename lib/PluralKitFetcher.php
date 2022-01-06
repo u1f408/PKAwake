@@ -146,7 +146,7 @@ class PluralKitFetcher {
 		/** @var array<int, mixed>|false $switch_info */
 		$switch_info = CurlHelpers::fetchUrl($switch_info_url, [], true);
 		if ($switch_info === false)
-			return null;
+			return $result;
 
 		/* Walk the switch list
 		 */

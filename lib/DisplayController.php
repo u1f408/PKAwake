@@ -49,7 +49,7 @@ class DisplayController extends Controller {
 			$switch_key = 'awakeswitch';
 			if (array_key_exists('tc', $query_values) && boolval($query_values['tc']))
 				$switch_key = 'currentswitch';
-			if ($pk_data['awakeswitch'] === null)
+			if (!array_key_exists('awakeswitch', $pk_data) || $pk_data['awakeswitch'] === null)
 				$switch_key = 'currentswitch';
 
 			$switch_ts = \DateTime::createFromFormat(
